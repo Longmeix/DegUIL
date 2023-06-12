@@ -1,0 +1,9 @@
+python==3.8.5
+numpy==1.19.5
+scipy==1.6.2
+torch==1.8.1+cu111
+nltk==3.6.1
+tqdm==4.60.0
+gensim==3.8.3
+pickle==4.0
+logging==0.5.1.2
