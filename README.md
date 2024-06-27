@@ -43,6 +43,8 @@ To run the code on **your own datasets**, please refer to utils/data_process.py 
 	  title={DegUIL: Degree-aware Graph Neural Networks for Long-tailed User Identity Linkage},
 	  author={Meixiu Long, Siyuan Chen, Xin Du, and Jiahai Wang},
       booktitle = {{ECML/PKDD}},
-      pages = {},
+      volume = {14174},
+      pages = {122-138},
+      publisher = {Springer},
       year = {2023}
 	}
