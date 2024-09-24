@@ -97,7 +97,7 @@ def parse_args():
 
 
 if __name__ == '__main__':
-    os.chdir('../')
+    # os.chdir('../')
     seed_torch(2023)
     args = parse_args()
     cfg.init_args(args)
