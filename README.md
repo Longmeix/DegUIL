@@ -24,7 +24,12 @@ Some codes refer to https://github.com/shuaiOKshuai/Tail-GNN
 
 ## 3. Usage
 ```python
+# FT dataset
+python Node2Vec/run_node2vec.py -- dataset FT   # get emb_n2v1.pkl
 python DegUIL.py --dataset FT --mu 0.001 --lr 5e-4
+
+# DBLP dataset
+python Node2Vec/run_node2vec.py -- dataset DBLP
 python DegUIL.py --dataset DBLP --mu 0.01 --lr 1e-3
 ```
 or
