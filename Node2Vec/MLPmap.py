@@ -1,7 +1,5 @@
 import config as cfg
 from models.base import UIL
-# from utils.torch_extension import to_device, bi_hit_x
-# from utils.np_extensions import pair2sparse
 from scipy.sparse import csr_matrix
 import torch
 from torch import nn
@@ -10,6 +8,7 @@ from utils.general import write_pickle, read_pickle
 from models.loss_neg import NSLoss
 import numpy as np
 from itertools import chain
+import utils.extensions as npe
 
 net_key = ['s', 't']
 
@@ -31,9 +30,14 @@ class MLPmap(UIL):
             MLP(dim, cfg.dim_feature),
             MLP(dim, cfg.dim_feature)]).to(self.device)
 
-        s, t = list(zip(*links[0]))
-        self.link_mat = csr_matrix((np.ones(len(s)), (s, t)),
-                                   shape=(embeds[0].shape[0], embeds[1].shape[0]))
+        # s, t = list(zip(*links[0]))
+        # self.link_mat = csr_matrix((np.ones(len(s)), (s, t)),
+        #                            shape=(embeds[0].shape[0], embeds[1].shape[0]))
+        shape = embeds[0].shape[0], embeds[1].shape[0]
+        link_train, link_test = links
+        link_mat = npe.pair2sparse(link_train, shape)
+        self.link_attr_train = self.addEdgeAttr(link_mat)  # real links of train set
+        self.pairs_l, self.wgt_l, self.adj_l = self.link_attr_train.values()  # link match
 
         self.opt_map = opt.Adam(
             chain(self.mapping.parameters(),
@@ -48,6 +52,19 @@ class MLPmap(UIL):
             loss=nn.MSELoss(reduction='sum')
         )
         self.mse = nn.MSELoss()
+
+    @staticmethod
+    def addEdgeAttr(adj_mat, exponent=3 / 4, percent=cfg.percent):
+        if not isinstance(adj_mat, np.ndarray):
+            adj_mat = adj_mat.toarray()
+        weights = np.abs(adj_mat > 0).sum(axis=0) ** exponent
+        clamp = npe.clamp_mat(adj_mat, percent)
+        pairs = [i.tolist() for i in clamp.nonzero()]
+        pairs = list(zip(*pairs))
+
+        attr_keys = ['pairs', 'weights', 'adj_mat']
+        attr_value = pairs, weights, csr_matrix(adj_mat)
+        return dict(zip(attr_keys, attr_value))
 
     def get_sims(self):
         f_s, f_t = self.get_embeds(is_map=True)
@@ -66,10 +83,11 @@ class MLPmap(UIL):
             self.mapping[1],
             # lambda x: x,
             cfg.neg_num,
-            None,  # None if sample=='neg'
-            self.link_mat,
+            # None,  # None if sample=='neg'
+            self.wgt_l,
+            self.adj_l,
             self.adj_t,
-            'neg'
+            'deg'
         )
         return loss_batch
 

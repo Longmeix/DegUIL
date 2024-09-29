@@ -101,14 +101,16 @@ def process_data(model, path, ratio='degree', k=5):
     idx_train_t, idx_super_t, idx_tail_t = split_nodes_by_ratio(adj_t, low=5, high_ratio=0.1)
 
     # link label
-    links = read_pickle(path + "links_degree.pkl")
-    # links = read_pickle(path + f"links_{ratio}.pkl")
+    if ratio == 0:
+        links = read_pickle(path + "links_degree.pkl")
+    else:
+        links = read_pickle(path + f"links_{ratio}.pkl")
 
     return features, (adj_s, adj_t), links, (idx_train_s, idx_super_s, idx_tail_s), \
            (idx_train_t, idx_super_t, idx_tail_t)
 
 
-def load_dataset(dataset, model, ratio, folder=None, k=10):
+def load_dataset(dataset, model, ratio=0.5, folder=None, k=10):
     path = folder + dataset + '/'
 
     DATASET = {

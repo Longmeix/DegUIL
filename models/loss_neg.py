@@ -62,14 +62,13 @@ class NSLoss(nn.Module):
         batch_size = len(idx_t)
         # adj_t = ((adj_t + adj_t.T) > 0) * 1.
 
-        if not isinstance(adj_t, torch.Tensor):
-            adj_t = torch.tensor(adj_t.toarray())
-        if not isinstance(probs, torch.Tensor):
-            probs = torch.tensor(probs)
-
         if sample == 'deg':
+            if not isinstance(probs, torch.Tensor):
+                probs = torch.tensor(probs)
             idx = torch.multinomial(probs, batch_size * neg_num, True)  # sample hub nodes as negative examples
         elif sample == 'neg':
+            if not isinstance(adj_t, torch.Tensor):
+                adj_t = torch.tensor(adj_t.toarray())
             idx = torch.Tensor(batch_size * neg_num).uniform_(0, len(adj_t)).long()  # random uniformly
         elif sample == 'sim':  # top-k closest nodes
             idx_t_sim = sim[idx_t]
@@ -125,53 +124,4 @@ class NSLoss(nn.Module):
         loss_neg_tt = self.loss(y_hat_tt, y_neg_tt)
 
         # return loss_pos
-        return (loss_pos + loss_neg_st + loss_neg_tt) / len(y_hat) # - loss_neg_tt
-        # return loss_pos + loss_neg_st + loss_neg_tt
-
-    # def get_xy(self, *input):
-    #     embed_s, embed_t, idx_s, idx_t, map_s, map_t,\
-    #         neg_num, probs, adj_mat, adj_t, sample_way = input
-    #     embed_s, embed_t = map_s(embed_s), map_t(embed_t)
-    #     similarity = pairwise_cosine(embed_s, embed_t)
-    #     x_s, x_t = embed_s[idx_s], embed_t[idx_t] # positive
-    #     # x_s, x_t = map_s(x_s), map_t(x_t)
-    #     # calculate node similarities, stand for positive sample
-    #     # x_pos = x_t
-    #     y_pos = self.get_adjacent(idx_s, idx_t, adj_mat)
-    #
-    #     if neg_num > 0:
-    #         batch_size = len(idx_s)
-    #         idx_neg = self.sample(neg_num, idx_t, adj_t, probs, similarity, sample_way)
-    #         x_neg = torch.stack([embed_t[idx] for idx in idx_neg])
-    #         y_neg_st = torch.stack([
-    #                     self.get_adjacent(idx_s, idx, adj_mat) for idx in idx_neg
-    #                 ])  # negative sample for s to t
-    #
-    #         y_neg_tt = torch.stack([
-    #                     self.get_adjacent(idx_t, idx, adj_t) for idx in idx_neg
-    #                 ])  # negative sample for t to t
-    #
-    #     else:
-    #         # x_t = x_pos
-    #         y_pos = y_pos
-    #
-    #     return x_s, x_t, x_neg, y_pos, y_neg_st*2 - 1, y_neg_tt*2 - 1
-    #
-    # def forward(self, *input):
-    #     x_s, x_t, x_neg, y_pos, y_neg_st, y_neg_tt = self.get_xy(*input)
-    #     y_hat = self.sim(x_s, x_t)
-    #     if y_hat.is_cuda:
-    #         y_pos = y_pos.to(cfg.device)
-    #         y_neg_st = y_neg_st.to(cfg.device)
-    #         y_neg_tt = y_neg_tt.to(cfg.device)
-    #
-    #     # loss_s = self.triple_loss()
-    #     loss_pos = self.cosine_loss(x_s, x_t, y_pos)
-    #     loss_neg_st, loss_neg_tt = .0, .0
-    #     for i, x_n in enumerate(x_neg):
-    #         # loss_neg_st += self.triple_loss(x_s, x_t, x_n)
-    #         loss_neg_st += self.cosine_loss(x_s, x_n, y_neg_st[i])
-    #         loss_neg_tt += self.cosine_loss(x_t, x_n, y_neg_tt[i])
-    #
-    #     return loss_pos + loss_neg_st + loss_neg_tt
-    #     # return loss_neg_st
+        return (loss_pos + loss_neg_st + loss_neg_tt) / len(y_hat)

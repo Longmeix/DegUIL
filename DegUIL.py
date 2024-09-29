@@ -16,7 +16,7 @@ import config as cfg
 parser = argparse.ArgumentParser()
 parser.add_argument("--dataset", type=str, default='FT', help='dataset: FT, DBLP')
 parser.add_argument("--model", type=str, default='DegUIL', help='model name: DegUIL, Tail-GNN')
-parser.add_argument('--ratio', default=0.5, type=float)
+parser.add_argument('--ratio', default=0, type=float, help="0 for link_degree.pkl, otherwise, links_{ratio}.pkl")
 parser.add_argument("--gnn_type", type=int, default=3, help='1: gcn, 2: gat, 3: gcn+gat')
 parser.add_argument("--hidden", type=int, default=64, help='hidden layer dimension')
 parser.add_argument("--batch_size", type=int, default=256, help='batch size')
@@ -95,7 +95,7 @@ def train_embed():
 
     return L_all
 
-seed_torch(args.seed)
+# seed_torch(args.seed)
 features, (adj_s, adj_t), links, idx_s, idx_t = data_process.load_dataset(dataset, model, args.ratio, folder='./datasets/', k=args.D)
 features = [emb.to(cfg.device) for emb in features]
 

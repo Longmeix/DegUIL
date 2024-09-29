@@ -92,8 +92,8 @@ class UIL(Instructor):
                 similarity_mat *= mask
             train_link, test_link = self.links
             mrr, hit_p = self.get_metrics(similarity_mat, k, train_link)
-            self.log.info('Train MRR@{} {:.4f} | Hit {:.4f}'.format(
-                k, mrr, hit_p
+            self.log.info('Train MRR {:.4f} | Hit@{} {:.4f}'.format(
+                mrr, k, hit_p
             ))
 
             row, col = [list(i) for i in zip(*train_link)]
@@ -102,8 +102,8 @@ class UIL(Instructor):
             similarity_mat[row] = default
             similarity_mat[:, col] = default
             mrr, hit_p = self.get_metrics(similarity_mat, k, test_link)
-            self.log.info('Test MRR@{} {:.4f} | Hit {:.4f}'.format(
-                k, mrr, hit_p
+            self.log.info('Test MRR {:.4f} | Hit@{} {:.4f}'.format(
+                mrr, k, hit_p
             ))
             return mrr, hit_p
 

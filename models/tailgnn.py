@@ -145,7 +145,6 @@ class TailGNN(nn.Module):
             x1 = torch.cat([x, x1], dim=1)
             # x1 = F.dropout(x1, self.dropout, training=self.training)
             x2, out2 = self.rel2(x1, adj, head)
-            # return torch.cat([x, x2], dim=1), [out1, out2]
             return x2, [out1, out2]
         else:
             x_gcn, out1_gcn = self.rel1_gcn(x, adj, head)

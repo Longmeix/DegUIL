@@ -56,6 +56,7 @@ def init_args(args):
 
     # save embeds file of best mrr
     best_embs_file = os.path.join(best_embs_path, '{}_{}_{}_best_embs.pkl'.format(model, dataset, ratio))
+    # best_embs_file = os.path.join(best_embs_path, '{}_{}_deg_best_embs.pkl'.format(model, dataset))
 
     log = strftime("logs/{}_{}_{}_{:.1f}_%m-%d_%H:%M:%S.txt".format(
         model, ''.join([s[0] for s in options.split()]), k, ratio

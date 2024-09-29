@@ -32,7 +32,8 @@ def load_data(data_dir, save_emb_path, ratio):
     adj_s = read_pickle(data_dir + 'adj_s.pkl').astype(np.float32)
     adj_t = read_pickle(data_dir + 'adj_t.pkl').astype(np.float32)
     embeds = read_pickle(save_emb_path)
-    links = read_pickle(data_dir + f'links_{ratio}.pkl')
+    # links = read_pickle(data_dir + f'links_{ratio}.pkl')
+    links = read_pickle(data_dir + f'links_degree.pkl')
 
     return adj_s, adj_t, embeds, links
 
@@ -81,14 +82,15 @@ def train_align(adj_s, adj_t, emb, links, args):
 def parse_args():
   parser = argparse.ArgumentParser(description='Node2Vec')
   parser.add_argument('--folder_dir', default='./datasets/', type=str)
+  parser.add_argument('--model', default='Node2Vec', type=str)
   parser.add_argument('--dataset', default='FT', help='FT, DBLP, D_W_15K_V1', type=str)
   parser.add_argument('--device', default='cuda:3', type=str)
-  # embeds
-  parser.add_argument('--model', default='Node2Vec', type=str)
+  # for embedding
   parser.add_argument('--embed_dim', type=int, default=cfg.dim_feature, help='Embedding dimension')
-  parser.add_argument('--mapping_lr', default=0.005, type=float)
+  # for alignment
+  parser.add_argument('--mapping_lr', default=0.0005, type=float)
   parser.add_argument('--mapping_epochs', default=70, type=int)
-  parser.add_argument('--ratio', default=0.5, type=float)
+  parser.add_argument('--ratio', default=0, type=float, help="0 for link_degree.pkl, otherwise, links_{ratio}.pkl")
   parser.add_argument('--top_k', default=cfg.k, type=int)
 
   args = parser.parse_args()
@@ -98,7 +100,7 @@ def parse_args():
 
 if __name__ == '__main__':
     # os.chdir('../')
-    seed_torch(2023)
+    # seed_torch(2023)
     args = parse_args()
     cfg.init_args(args)
     cfg.epochs = args.mapping_epochs
